@@ -6,7 +6,7 @@ import scipy.optimize as sopt
 import torch.nn.functional as F
 from torch.autograd import grad
 
-def train(epoch, length, dataloader, model, optimizer, batch_size, writer):    
+def train(epoch, dataloader, model, optimizer, batch_size, writer):    
     model.train()
 
     step = 0.0
@@ -21,7 +21,7 @@ def train(epoch, length, dataloader, model, optimizer, batch_size, writer):
         step += 1.0
     return loss, sum_mat/step
 
-def train_TDRO(epoch, length, dataloader, model, optimizer, batch_size, writer, n_group, n_period, loss_list, w_list, alpha, eta, epsilon, p, switch, beta_p):
+def train_TDRO(epoch, dataloader, model, optimizer, batch_size, writer, n_group, n_period, loss_list, w_list, mu, eta, lamda, beta_p):
 
     model.train()
 
@@ -46,7 +46,7 @@ def train_TDRO(epoch, length, dataloader, model, optimizer, batch_size, writer, 
                         de = torch.sum(indices)
                         loss_single = torch.sum(sample_loss*(indices).cuda())
                         grad_single = grad(loss_single, param, retain_graph=True)[-1].reshape(-1) # linear layer input*output
-                        grad_single = grad_single/(grad_single.norm()+1e-16) * torch.pow(loss_single/(de+1e-16), p) 
+                        grad_single = grad_single/(grad_single.norm()+1e-16) * torch.pow(loss_single/(de+1e-16), 1) 
                         loss_ge[g_idx,e_idx] = loss_single
                         grad_ge[g_idx,e_idx] = grad_single
                         
@@ -62,11 +62,11 @@ def train_TDRO(epoch, length, dataloader, model, optimizer, batch_size, writer, 
             sum_gie = torch.mean(grad_ge * beta_e, dim=[0,1])
             trend_[g_idx] = g_j@sum_gie
 
-        loss_ = loss_ * (1-epsilon) + trend_ * epsilon
+        loss_ = loss_ * (1-lamda) + trend_ * lamda
 
         # loss consistency enhancement
         loss_[loss_==0] = loss_list[loss_==0]
-        loss_list = (1 - alpha) * loss_list + alpha * loss_ 
+        loss_list = (1 - mu) * loss_list + mu * loss_ 
 
         # group importance smoothing
         update_factor = eta * loss_list
