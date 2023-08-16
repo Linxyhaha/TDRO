@@ -1,0 +1,10 @@
+Amazon:
+sh run.sh TDRO amazon 1000 0.001 0.001 5 5 0.2 0.2 0.3 global log 0
+
+Micro-video:
+sh run.sh TDRO micro-video 1000 0.001 0.001 3 3 0.2 0.1 0.9 global log 0
+
+Kwai:
+sh run.sh TDRO kwai 1000 0.001 1e-5 3 5 0.9 0.1 0.3 relative log 0
+
+The default hyper-parameter settings of backend models can be found in Appendix.

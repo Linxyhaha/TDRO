@@ -6,22 +6,16 @@ import scipy.optimize as sopt
 import torch.nn.functional as F
 from torch.autograd import grad
 
-def train(epoch, dataloader, model, optimizer, batch_size, writer):    
+def train_ERM(dataloader, model, optimizer):    
     model.train()
-
-    step = 0.0
-    sum_mat = 0.0
-
     for user_tensor, item_tensor in dataloader:
         optimizer.zero_grad()
         loss = model.loss(user_tensor.cuda(), item_tensor.cuda())
         loss.backward()
         optimizer.step()
-        sum_mat += model.mat.detach().cpu().item()
-        step += 1.0
-    return loss, sum_mat/step
+    return loss
 
-def train_TDRO(epoch, dataloader, model, optimizer, batch_size, writer, n_group, n_period, loss_list, w_list, mu, eta, lamda, beta_p):
+def train_TDRO(dataloader, model, optimizer, n_group, n_period, loss_list, w_list, mu, eta, lamda, beta_p):
 
     model.train()
 
@@ -86,6 +80,6 @@ def train_TDRO(epoch, dataloader, model, optimizer, batch_size, writer, n_group,
 
     with torch.no_grad():
         model.result[model.emb_id] = model.id_embedding[model.emb_id].data
-        model.result[model.feat_id + model.num_user] = model.encoder()[model.feat_id].data
+        model.result[model.feat_id + model.num_user] = model.feature_extractor()[model.feat_id].data
 
     return loss_weightsum
