@@ -1,6 +1,8 @@
 # Temporally and Distributionally Robust Optimization for Cold-start Recommendation
 :bulb: This is the pytorch implementation of our paper 
 > Temporally and Distributionally Robust Optimization for Cold-start Recommendation
+>
+> Xinyu Lin, Wenjie Wang, Jujia Zhao, Yongqi Li, Fuli Feng, Tat-Seng Chua
 
 ## Environment
 - Anaconda 3
@@ -50,3 +52,7 @@ sh run.sh TDRO amazon 1000 0.001 0.001 5 5 0.2 0.2 0.3 global log 0
 cd ./code
 sh inference.sh amazon <ckpt_path> 0
 ```
+
+## License
+
+NUS © [NExT++](https://www.nextcenter.org/)
