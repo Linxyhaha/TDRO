@@ -58,7 +58,7 @@ If you find our work is useful for your research, please consider citing:
 @inproceedings{lin2023temporally,
       title={Temporally and Distributionally Robust Optimization for Cold-start Recommendation}, 
       author={Xinyu Lin, Wenjie Wang, Jujia Zhao, Yongqi Li, Fuli Feng, and Tat-Seng Chua},
-      booktitle={AAAI}
+      booktitle={AAAI},
       year={2024}
 }
 ```
