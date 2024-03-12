@@ -34,6 +34,7 @@ def init():
     parser.add_argument('--num_sample', type=float, default=0.5, help='probability of robust training.')
 
     parser.add_argument('--gpu', default='0', help='gpu id')
+    parser.add_argument("--no_cuda", action="store_true", help="disable the cuda")
     parser.add_argument('--save_path', default='./models/', help='model save path')
     parser.add_argument('--inference',action='store_true', help='only inference stage')
     parser.add_argument('--ckpt', type=str, help='pretrained model path')
@@ -89,7 +90,6 @@ if __name__ == '__main__':
 
     temp_value = args.temp_value
     step = args.step
-    portion_list = eval(args.portion_list) if args.inference else None
 
     dim_E = args.dim_E
     ##########################################################################################################################################
@@ -114,7 +114,7 @@ if __name__ == '__main__':
     pretrained_emb = np.load(args.pretrained_emb+data_path+'/all_item_feature.npy',allow_pickle=True)
     pretrained_emb = torch.FloatTensor(pretrained_emb).cuda()
 
-    train_dataset = DRO_Dataset(num_user, num_item, user_item_all_dict, cold_item, train_data, num_neg, args.num_group, num_period, split_mode, pretrained_emb)
+    train_dataset = DRO_Dataset(num_user, num_item, user_item_all_dict, cold_item, train_data, num_neg, args.num_group, args.num_period, split_mode, pretrained_emb)
     train_dataloader = DataLoader(train_dataset, batch_size, shuffle=True, num_workers=num_workers)
     
     print('Data has been loaded.')
@@ -123,10 +123,9 @@ if __name__ == '__main__':
     if args.inference:
         with torch.no_grad():
             model = torch.load('models/' + args.ckpt)
-
-            test_result = full_ranking(0, model, test_data, tv_dict, None, False, step, topK)
-            test_result_warm = full_ranking(0, model, test_warm_data, tv_dict, cold_item, False, step, topK)
-            test_result_cold = full_ranking(0, model, test_cold_data, tv_dict, warm_item, False, step, topK)
+            test_result = full_ranking(model, test_data, tv_dict, None, False, step, topK)
+            test_result_warm = full_ranking(model, test_warm_data, tv_dict, cold_item, False, step, topK)
+            test_result_cold = full_ranking(model, test_cold_data, tv_dict, warm_item, False, step, topK)
             print('---'*18)
             print('All')
             print_results(None,None,test_result)
